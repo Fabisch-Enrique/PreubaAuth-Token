@@ -46,7 +46,7 @@ defmodule PreubaAuth.Accounts do
     user
     |> User.email_changeset(attrs)
     |> User.validate_current_password(password)
-    |> Ecto.changeset.apply_action(:update)
+    |> Ecto.Changeset.apply_action(:update)
   end
 
   @doc """
@@ -73,7 +73,7 @@ defmodule PreubaAuth.Accounts do
 
     Ecto.Multi.new()
     |> Ecto.Multi.update(:user, changeset)
-    |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_context_query(user, [context]))
+    |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, [context]))
   end
 
   @doc """
@@ -132,6 +132,14 @@ defmodule PreubaAuth.Accounts do
     Repo.one(query)
   end
 
+  @doc """
+  DELETES THE SIGNED TOKEN WITH THE GIVEN CONTEXT
+  """
+  def delete_session_token(token) do
+    Repo.delete_all(UserToken.token_and_context_query(token, "session"))
+    :ok
+  end
+
   ## CONFIRMATION
 
   @doc """
@@ -167,7 +175,7 @@ defmodule PreubaAuth.Accounts do
   defp confirm_user_multi(user) do
     Ecto.Multi.new()
     |> Ecto.Multi.update(:user, User.confirm_changeset(user))
-    |> Ecto.Multi.elete_all(:tokens, UserToken.user_and_contexts_query(user, ["confirm"]))
+    |> Ecto.Multi.delete_all(:tokens, UserToken.user_and_contexts_query(user, ["confirm"]))
   end
 
   ## RESET PASSWORD
@@ -176,18 +184,17 @@ defmodule PreubaAuth.Accounts do
   DELIVERS THE RESET PASSWORD EMAIL TO THE SPECIFIC GIVEN USER
   """
 
-  def deliver_user_reset_password_instructions(%User{} = user, reset_password_url_fun)
-    with is_function(reset_password_url_fun, 1) do
+  def deliver_user_reset_password_instructions(%User{} = user, reset_password_url_fun)  when is_function(reset_password_url_fun, 1) do
       {encoded_token, user_token} = UserToken.build_email_token(user, "reset_password")
       Repo.insert!(user_token)
-      UserNotifier.deliver_user_reset_password_instructions(user, reset_password_url_fun.(encoded_token))
+      UserNotifier.deliver_reset_password_instructions(user, reset_password_url_fun.(encoded_token))
     end
 
     @doc """
     GET THE USER BY RESET PASSWORD TOKEN
     """
 
-    def get_user_by_reset_password(token) do
+    def get_user_by_reset_password_token(token) do
       with {:ok, query} <- UserToken.verify_email_token_query(token, "reset_password"),
           %User{} = user <- Repo.one(query) do
             user

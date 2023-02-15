@@ -5,7 +5,7 @@ defmodule PreubaAuth.Accounts.User do
   schema "users" do
     field :email, :string
     field :password, :string, virtual: true, redact: true
-    field :hasshed_password, :string, redact: true
+    field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
 
     timestamps()
@@ -42,14 +42,14 @@ defmodule PreubaAuth.Accounts.User do
 
   defp hash_password(changeset, opts) do
     hash_password? = Keyword.get(opts,  :hash_password, true)
-    password = get_chamnge(changeset, :password)
+    password = get_change(changeset, :password)
 
 
     if hash_password? && password && changeset.valid? do
       changeset
 
       |> validate_length(:password, max: 72, count: :bytes)
-      |> put_change(:hashed_password, Bcrypyt.hash_pwd_salt(password))
+      |> put_change(:hashed_password, Bcrypt.hash_pwd_salt(password))
       |> delete_change(:password)
     else
       changeset
@@ -94,12 +94,11 @@ defmodule PreubaAuth.Accounts.User do
   @doc """
   VERIFIES THE PASSWORD
 
-  IF THERE'S NO USER R THE USER DOESN'T HAVE A PASSWORD, WE CALL "Bcrypt.no_user_verify/0" to avoid timing attacks
+  IF THERE'S NO USER THE USER DOESN'T HAVE A PASSWORD, WE CALL "Bcrypt.no_user_verify/0" to avoid timing attacks
   """
 
-  def valid_password?(PreubaAuth.Accounts.User{hashed_password: hashed_password}, password)
-    when is_binary(hashed_password) and byte_size(password) > 0 do
-      Bcrypt.verify_pass(password, hashed_password)
+  def valid_password?(%PreubaAuth.Accounts.User{hashed_password: hashed_password}, password) when is_binary(hashed_password) and byte_size(password) > 0 do
+    Bcrypt.verify_pass(password, hashed_password)
   end
 
   def valid_password?(_, _) do

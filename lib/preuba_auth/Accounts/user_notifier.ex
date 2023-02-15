@@ -1,11 +1,10 @@
 defmodule PreubaAuth.Accounts.UserNotifier do
-  import swoosh.Email
+  import Swoosh.Email
 
   alias PreubaAuth.Mailer
 
-  @doc """
-  THIS FUNCTION DELIVERS THE EMAIL USING THE APPLICATION MAILER
-  """
+
+  #THIS FUNCTION DELIVERS THE EMAIL USING THE APPLICATION MAILER
 
   defp deliver(receipient, subject, body) do
     email =
@@ -15,8 +14,8 @@ defmodule PreubaAuth.Accounts.UserNotifier do
       |> subject(subject)
       |> text_body(body)
 
-    with {:ok, _metadata} <- Mail.deliver(email) do
-      {:ok, mail}
+    with {:ok, _metadata} <- Mailer.deliver(email) do
+      {:ok, email}
     end
   end
 
@@ -25,7 +24,7 @@ defmodule PreubaAuth.Accounts.UserNotifier do
   """
 
   def deliver_confirmation_instructions(user, url) do
-    deliver(user.email, "Confirmation instruction", """)
+    deliver(user.email, "Confirmation instructions", """
 
     ==============================
 

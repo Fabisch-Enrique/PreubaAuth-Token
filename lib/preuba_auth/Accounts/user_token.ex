@@ -34,7 +34,7 @@ defmodule PreubaAuth.Accounts.UserToken do
 
   def build_session_token(user) do
     token = :crypto.strong_rand_bytes(@rand_size)
-    {token, %UserToken{token: token, contex: "session", user_id: user_id}}
+    {token, %UserToken{token: token, context: "session", user_id: user.id}}
   end
 
   @doc """
@@ -48,7 +48,7 @@ defmodule PreubaAuth.Accounts.UserToken do
   def verify_session_token_query(token) do
     query =
       from(token in token_and_context_query(token, "session"),
-        join: user in assoc(oken, :user),
+        join: user in assoc(token, :user),
         where: token.inserted_at > ago(@session_validity_in_days, "day"),
         select: user
       )
@@ -75,7 +75,7 @@ defmodule PreubaAuth.Accounts.UserToken do
     hashed_token = :crypto.hash(@hash_algorithm, token)
 
     {Base.url_encode64(token, padding: false),
-     %UserToken{token: hashed_token, context: context, sent_to: sent_to, user_id: user_id}}
+     %UserToken{token: hashed_token, context: context, sent_to: sent_to, user_id: user.id}}
   end
 
   @doc """
@@ -93,12 +93,12 @@ defmodule PreubaAuth.Accounts.UserToken do
   def verify_email_token_query(token, context) do
     case Base.url_decode64(token, padding: false) do
       {:ok, decoded_token} ->
-        hashed_token = :crypto.hash(@hash_algorithm, decoded)
+        hashed_token = :crypto.hash(@hash_algorithm, decoded_token)
         days = days_for_context(context)
 
         query =
           from(token in token_and_context_query(hashed_token, context),
-            join: user in assoc(token, user),
+            join: user in assoc(token, :user),
             where: token.inserted_at > ago(^days, "day") and token.sent_to == user.email,
             select: user
           )
@@ -146,11 +146,20 @@ defmodule PreubaAuth.Accounts.UserToken do
   RETUNS THE TOKEN STRUCT OR THE GIVEN TOKEN VALUE AND CONTEXT
   """
 
-  def user_and_context_query(user, :all) do
-    from t in UserToken, where: t.user_id == ^user.id
+  def token_and_context_query(token, context) do
+    from UserToken, where: [token: ^token, context: ^context]
   end
 
-  def user_and_context_query(user, [_ | _] = context) do
-    from t in UserToken, where: t.user_id == ^user.id andt.context in ^contexts
+
+  @doc """
+  GETS ALL TOKENS FOR THE GIVEN USER, FOR THE GIVEN CONTEXTS
+  """
+
+  def user_and_contexts_query(user, :all) do
+    from(t in UserToken, where: t.user_id == ^user.id)
+  end
+
+  def user_and_contexts_query(user, [_ | _] = contexts) do
+    from(t in UserToken, where: t.user_id == ^user.id and t.context in ^contexts)
   end
 end
