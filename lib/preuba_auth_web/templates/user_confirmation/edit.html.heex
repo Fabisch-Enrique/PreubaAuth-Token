@@ -6,7 +6,7 @@
     </div>
 </.form>
 
-<P>
-    <%= link "Register", to: Routes.user_registration_path(@conn, :new) %> |
-    <%= link "Log In", to: Routes.user_registration_path(@conn, :new) %>
+<p>
+    <%= link "Register", to: Routes.user_registration_path(@conn, :new) %> | 
+    <%= link "Log In", to: Routes.user_session_path(@conn, :new) %>
 </p>

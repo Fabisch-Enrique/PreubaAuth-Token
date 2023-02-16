@@ -13,7 +13,7 @@
 
     <%= label f, :email %>
     <%= email_input f, :email, required: true %>
-    <%= errot_tag f, :email %>
+    <%= error_tag f, :email %>
 
     <%= label f, :current_password, for: "current_password_for_email" %>
     <%= password_input f, :current_password, required: true, name: "current_password", id: "current_password_for_email" %>
@@ -36,7 +36,7 @@
     <%= hidden_input f, :action, name: "action", value: "update_password" %>
 
     <%= label f, :password, "New Password" %>
-    <%= password_input f, :password required: true %>
+    <%= password_input f, :password, required: true %>
     <%= error_tag f, :password %>
 
     <%= label f, :password_confirmation, "Confirm New Password" %>
@@ -44,7 +44,7 @@
     <%= error_tag f, :password_confirmation %>
 
     <%= label f, :current_password, for: "current_password_for_password" %>
-    <%= password_input f, :current_password, required: true, name: "current_password", id="current_password_for_password" %>
+    <%= password_input f, :current_password, required: true, name: "current_password", id: "current_password_for_password" %>
     <%= error_tag f, :current_password %>
 
     <div>

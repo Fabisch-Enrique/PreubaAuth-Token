@@ -16,9 +16,17 @@ defmodule PreubaAuthWeb.UserSettingsController do
 
     case Accounts.apply_user_email(user, password, user_params) do
       {:ok, applied_user} ->
-        Accounts.deliver_update_email_instructions(applied_user, user.emai, &Routes.user_settings_url(conn, :confirm_email, &1))
+        Accounts.deliver_update_email_instructions(
+          applied_user,
+          user.emai,
+          &Routes.user_settings_url(conn, :confirm_email, &1)
+        )
+
         conn
-        |> put_flash(:info, "A link to confirm your email change has been sent to the new address")
+        |> put_flash(
+          :info,
+          "A link to confirm your email change has been sent to the new address"
+        )
         |> redirect(to: Routes.user_settings_path(conn, :edit))
 
       {:error, changeset} ->
@@ -63,5 +71,4 @@ defmodule PreubaAuthWeb.UserSettingsController do
     |> assign(:email_changeset, Accounts.change_user_email(user))
     |> assign(:password_changeset, Accounts.change_user_password(user))
   end
-
 end

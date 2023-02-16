@@ -3,8 +3,7 @@ defmodule PreubaAuth.Accounts.UserNotifier do
 
   alias PreubaAuth.Mailer
 
-
-  #THIS FUNCTION DELIVERS THE EMAIL USING THE APPLICATION MAILER
+  # THIS FUNCTION DELIVERS THE EMAIL USING THE APPLICATION MAILER
 
   defp deliver(receipient, subject, body) do
     email =

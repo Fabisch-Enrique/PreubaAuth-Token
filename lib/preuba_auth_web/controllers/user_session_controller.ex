@@ -4,13 +4,17 @@ defmodule PreubaAuthWeb.UserSessionController do
   alias PreubaAuth.Accounts
   alias PreubaAuthWeb.UserAuth
 
+  def new(conn, _params) do
+    render(conn, "new.html", error_message: nil)
+  end
+
   def create(conn, %{"user" => user_params}) do
     %{"email" => email, "password" => password} = user_params
 
     if user = Accounts.get_user_by_email_and_password(email, password) do
       UserAuth.login_user(conn, user, user_params)
     else
-      #IN ORDER TO PREVENT ENUMERATION ATTACKS, WE DON'T DISCLOSE WHETHER THE EMAIL IS REGISTERED
+      # IN ORDER TO PREVENT ENUMERATION ATTACKS, WE DON'T DISCLOSE WHETHER THE EMAIL IS REGISTERED
       conn
       |> put_flash(:error, "Invalid email or password")
       |> redirect(to: Routes.user_login_path(conn, :new))

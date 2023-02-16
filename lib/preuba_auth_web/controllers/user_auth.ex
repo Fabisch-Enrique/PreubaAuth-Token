@@ -6,12 +6,11 @@ defmodule PreubaAuthWeb.UserAuth do
   alias PreubaAuth.Accounts
   alias PreubaAuthWeb.Router.Helpers, as: Routes
 
-  #MAKE THE REMEMBER ME COOKIE VALID FOR 60 DAYS
+  # MAKE THE REMEMBER ME COOKIE VALID FOR 60 DAYS
 
   @max_age 60 * 60 * 24 * 60
   @remember_me_cookie "_preuba_auth_web_user_remeber_me"
   @remember_me_options [sign: true, max_age: @max_age, same_site: "Lax"]
-
 
   @doc """
   LOGS THE USER IN
@@ -24,14 +23,15 @@ defmodule PreubaAuthWeb.UserAuth do
 
   def login_user(conn, user, params \\ %{}) do
     token = Accounts.generate_user_session_token(user)
-    user_return_to = get_session(conn, :user_return_to)
+    #user_return_to = get_session(conn, :user_return_to)
 
     conn
     |> renew_session()
     |> put_session(:user_token, token)
     |> put_session(:live_socket_id, "user_sessions:#{Base.url_encode64(token)}")
     |> maybe_write_a_remember_me_cookie(token, params)
-    |> redirect(to: user_return_to || signed_in_path(conn))
+    |> redirect(to: Routes.page_path(conn, :show, user.id))
+    #|> redirect(to: user_return_to || signed_in_path(conn))
   end
 
   defp maybe_write_a_remember_me_cookie(conn, token, %{"remember_me" => "true"}) do
@@ -42,16 +42,15 @@ defmodule PreubaAuthWeb.UserAuth do
     conn
   end
 
-  #THIS FUNCTIONRENEWS THE SESSION ID AND ERASES THE WHOLE SESSION TO AVOID FIXATION ATTACKS.
-  #IF THERE'S ANY DATA IN THE SESSION YOU MAY WANT TO PRESERVE AFTER login/logout,
-  #YOU MUST EXPLICITLY FETCH THE SESSION DATA BEFORE CLEARING AND IMMEDIATELY SEE IT AFTER CLEARING.
+  # THIS FUNCTIONRENEWS THE SESSION ID AND ERASES THE WHOLE SESSION TO AVOID FIXATION ATTACKS.
+  # IF THERE'S ANY DATA IN THE SESSION YOU MAY WANT TO PRESERVE AFTER login/logout,
+  # YOU MUST EXPLICITLY FETCH THE SESSION DATA BEFORE CLEARING AND IMMEDIATELY SEE IT AFTER CLEARING.
 
   defp renew_session(conn) do
     conn
     |> configure_session(renew: true)
     |> clear_session()
   end
-
 
   @doc """
   LOGS THE USER OUT
@@ -72,7 +71,6 @@ defmodule PreubaAuthWeb.UserAuth do
     |> delete_resp_cookie(@remember_me_cookie)
     |> redirect(to: "/")
   end
-
 
   @doc """
   AUTHENTICATES THE USER BY LOOKING INTO THE SESSION AND REMEMBER ME
@@ -117,7 +115,6 @@ defmodule PreubaAuthWeb.UserAuth do
   def on_mount(:get_user_by_reset_password_token, params, _session, socket) do
     if socket.assigns.alive_action in [:edit, :update] do
       set_user_and_token(socket, params)
-
     else
       {:cont, socket}
     end
@@ -130,8 +127,8 @@ defmodule PreubaAuthWeb.UserAuth do
           Accounts.get_user_by_session_token(user_token)
         end)
 
-        %{} ->
-          LiveView.assign_new(socket, :current_user, fn -> nil end)
+      %{} ->
+        LiveView.assign_new(socket, :current_user, fn -> nil end)
     end
   end
 
@@ -161,7 +158,6 @@ defmodule PreubaAuthWeb.UserAuth do
       conn
     end
   end
-
 
   @doc """
   FOR RPOUTES THAT REQUIRE THE USER TO BE AUTHENTICATED, PASS THROUGH =>

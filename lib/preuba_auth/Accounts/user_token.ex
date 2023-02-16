@@ -15,13 +15,13 @@ defmodule PreubaAuth.Accounts.UserToken do
   # IT IS IMPORTANT TO KEEP THE RESET PASSWORD TOKEN EXPIRY SHORT
   # SINCE SOMEONE WITH ACCES CAN TAKE OVER THE ACCOUNT
 
-  schema "user_tokens" do
+  schema "users_tokens" do
     field(:token, :binary)
     field(:context, :string)
     field(:sent_to, :string)
     belongs_to(:user, PreubaAuth.Accounts.User)
 
-    timestamps(inserted_at: false)
+    timestamps(updated_at: false)
   end
 
   @doc """
@@ -57,7 +57,7 @@ defmodule PreubaAuth.Accounts.UserToken do
   end
 
   @doc """
-  BUILD A TOKENND ITS HASH TO BE DELIVERED TO THE USER'S EMAIL
+  BUILD A TOKEN ITS HASH TO BE DELIVERED TO THE USER'S EMAIL
 
   THE NON-HASHED TOKEN IS SENT TO THE USER EMAIL WHILE THE HASHED PART IS STORED IN THE DATABASE.
   THE ORIGINAL TOKEN CANNOT BE RECONSTRUCTED, WHICH MEANS ANY ONE WITH READ-ONLY ACCESS TO THE DATABASE CANNOT DIRECTLY USE THE TOKEN IN THE
@@ -149,7 +149,6 @@ defmodule PreubaAuth.Accounts.UserToken do
   def token_and_context_query(token, context) do
     from UserToken, where: [token: ^token, context: ^context]
   end
-
 
   @doc """
   GETS ALL TOKENS FOR THE GIVEN USER, FOR THE GIVEN CONTEXTS

@@ -9,11 +9,18 @@ defmodule PreubaAuthWeb.UserConfirmationController do
 
   def create(conn, %{"user" => %{"email" => email}}) do
     if user = Accounts.get_user_by_email(email) do
-      Accounts.deliver_user_confirmation_instructions(user, &Routes.user_confirmation_url(conn, :edit, &1))
+      Accounts.deliver_user_confirmation_instructions(
+        user,
+        &Routes.user_confirmation_url(conn, :edit, &1)
+      )
     end
 
     conn
-    |> put_flash(:info, "If your email is in our system and it has not yet been confirmed, " <> "You will receive an email with instructions shortly")
+    |> put_flash(
+      :info,
+      "If your email is in our system and it has not yet been confirmed, " <>
+        "You will receive an email with instructions shortly"
+    )
     |> redirect(to: "/")
   end
 
@@ -29,9 +36,9 @@ defmodule PreubaAuthWeb.UserConfirmationController do
         |> redirect(to: "/")
 
       :error ->
-        #IF THERE'S A CURRENT USER AND THE ACCOUNT WAS ALREADY CONFIRMED, CHANCES ARE,
-        #THE CONFIRMATION LINK HAS ALREADY BEEN VISITED, EITHER BY (some automation or the user themselves)
-        #SO, WE REDIRECT WITHOUT A WARNING MESSAGE.
+        # IF THERE'S A CURRENT USER AND THE ACCOUNT WAS ALREADY CONFIRMED, CHANCES ARE,
+        # THE CONFIRMATION LINK HAS ALREADY BEEN VISITED, EITHER BY (some automation or the user themselves)
+        # SO, WE REDIRECT WITHOUT A WARNING MESSAGE.
 
         case conn.assigns do
           %{current_user: %{confirmed_at: confirmed_at}} when not is_nil(confirmed_at) ->
@@ -39,7 +46,7 @@ defmodule PreubaAuthWeb.UserConfirmationController do
 
           %{} ->
             conn
-            |> put_flash(:error,  "User Confirmatiomn  Link is invalid or expired")
+            |> put_flash(:error, "User Confirmatiomn  Link is invalid or expired")
             |> redirect(to: "/")
         end
     end
