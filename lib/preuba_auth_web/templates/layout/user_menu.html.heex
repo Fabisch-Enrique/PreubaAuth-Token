@@ -5,6 +5,6 @@
         <li><%= link "Log Out", to: Routes.user_settings_path(@conn, :delete), method: :delete %></li>
         <% else %>
         <li><%= link "Register", to: Routes.user_registration_path(@conn, :new) %></li>
-        <li><%= link "Log In", to: Routes.user_login_path(@conn, :new) %></li>
+        <li><%= link "Log In", to: Routes.user_session_path(@conn, :new) %></li>
     <% end %>
 </ul>

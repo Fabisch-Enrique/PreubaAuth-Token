@@ -42,16 +42,16 @@ defmodule PreubaAuthWeb.Router do
   scope "/", PreubaAuthWeb do
     pipe_through([:browser, :require_authenticated_user])
 
+    get("/:id", PageController, :show)
     get("/users/settings", UserSettingsController, :edit)
     put("/users/settings", UserSettingsController, :update)
+    delete("/users/log_out", UserSessionController, :delete)
     get("/users/settings/confirm_email/:token", UserSettingsController, :confirm_email)
-    get("/:id", PageController, :show)
   end
 
   scope "/", PreubaAuthWeb do
     pipe_through(:browser)
-
-    delete("/users/log_out", UserSessionController, :delete)
+ 
     get("/users/confirm", UserConfirmationController, :new)
     post("/users/confirm", UserConfirmationController, :create)
     get("/users/confirm/:token", UserConfirmationController, :edit)

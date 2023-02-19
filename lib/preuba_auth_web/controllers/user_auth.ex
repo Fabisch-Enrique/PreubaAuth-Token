@@ -96,6 +96,7 @@ defmodule PreubaAuthWeb.UserAuth do
     end
   end
 
+  # MIGRATING AUTH CONTROLLERS TO LIVEVIEW....
   def on_mount(:mount_current_user, _params, session, socket) do
     {:cont, mount_current_user(session, socket)}
   end
@@ -105,7 +106,7 @@ defmodule PreubaAuthWeb.UserAuth do
 
     case socket.assigns.current_user do
       nil ->
-        {:halt, LiveView.redirect(socket, to: Routes.user_login_path(socket, :new))}
+        {:halt, LiveView.redirect(socket, to: Routes.user_session_path(socket, :new))}
 
       _ ->
         {:cont, socket}

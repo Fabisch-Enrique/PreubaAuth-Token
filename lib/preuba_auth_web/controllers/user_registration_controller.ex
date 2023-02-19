@@ -3,7 +3,6 @@ defmodule PreubaAuthWeb.UserRegistrationController do
 
   alias PreubaAuth.Accounts
   alias PreubaAuth.Accounts.User
-  alias PreubaAuthWeb.UserAuth
 
   def new(conn, _params) do
     changeset = Accounts.change_user_registration(%User{})
@@ -21,7 +20,7 @@ defmodule PreubaAuthWeb.UserRegistrationController do
 
         conn
         |> put_flash(:info, "User Created/Registered Successfully.")
-        |> UserAuth.login_user(user)
+        |> redirect(to: "/")
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, "new.html", changeset: changeset)

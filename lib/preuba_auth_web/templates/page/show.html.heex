@@ -1,6 +1,8 @@
-<h1>Showing a User</h1>
-
+<h1>This is your page </h1>
 <%= @user.email %>
-<%= @user.password %>
 
+<h1>You can logout down here</h1>
 
+<p>
+    <%= link "Log Out", to: Routes.user_session_path(@conn, :delete), method: :delete %>
+</p>

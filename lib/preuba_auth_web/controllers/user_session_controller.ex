@@ -17,7 +17,7 @@ defmodule PreubaAuthWeb.UserSessionController do
       # IN ORDER TO PREVENT ENUMERATION ATTACKS, WE DON'T DISCLOSE WHETHER THE EMAIL IS REGISTERED
       conn
       |> put_flash(:error, "Invalid email or password")
-      |> redirect(to: Routes.user_login_path(conn, :new))
+      |> redirect(to: Routes.user_session_path(conn, :new))
     end
   end
 
