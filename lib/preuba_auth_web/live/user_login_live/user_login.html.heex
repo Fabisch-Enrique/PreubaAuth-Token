@@ -1,0 +1,24 @@
+<h1>Log In</h1>
+
+<.form let={f} for={:user} phx-submit="log_in" phx-trigger-action={@rigger_submit} action={Routes.user_session_path(@socket, :create)} as={:user}}>
+
+<%= if @error_message do %>
+    <div class="alert alert_danger">
+        <p><%= @error_message %></p>
+    </div>
+<% end %>
+
+<%= label f, :email %>
+<%= email_input f, :email, required: true %>
+
+<%= label f, :password %>
+<%= password_input f, :password, required: true %>
+
+<%= label f, :remember_me, "Keep me logged in for 60 days" %>
+<%= checkbox f, :remember_me %>
+
+<div>
+    <%= submit "Log In" %>
+</div>
+
+</.form>

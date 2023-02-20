@@ -1,0 +1,29 @@
+<h1>Register User</h1>
+
+<.form let={f} for={@changeset} phx-submit="save" phx-change="validate" phx-trigger-action={@trigger_submit} action={Routes.user_session_path(@socket, :create)} as={:user}>
+
+<%= if @changeset.action do %>
+
+    <div class="alert alert-danger">
+        <p>Ooops Something Went Wrong, Please Check the errors below.</p>
+    </div>
+
+<% end %>
+
+<%= label f, :email %>
+<%= email_input f, :email, required: true %>
+<%= error_tag f, :email %>
+
+<%= label f, :password %>
+<%= password_input f, :password, required: true %>
+<%= error_tag f, :password %>
+
+<div>
+    <%= submit "Register" %>
+</div>
+
+</.form>
+
+<p>
+    <%= link "Log In", to: Routes.user_session_path(@socket, :new) %>
+</p>
