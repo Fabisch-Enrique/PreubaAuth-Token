@@ -1,4 +1,7 @@
 defmodule PreubaAuthWeb.Router do
+  alias PreubaAuthWeb.UserResetPasswordLive
+  alias PreubaAuthWeb.UserLoginLive
+  alias PreubaAuthWeb.UserRegistrationLive
   use PreubaAuthWeb, :router
 
   import PreubaAuthWeb.UserAuth
@@ -28,12 +31,20 @@ defmodule PreubaAuthWeb.Router do
   scope "/", PreubaAuthWeb do
     pipe_through([:browser, :redirect_if_user_is_authenticated])
 
-    get("/users/register", UserRegistrationController, :new)
-    post("/users/register", UserRegistrationController, :create)
-    get("/users/log_in", UserSessionController, :new)
-    post("/users/log_in", UserSessionController, :create)
+    # get("/users/register", UserRegistrationController, :new)
+    # post("/users/register", UserRegistrationController, :create)
+    # get("/users/log_in", UserSessionController, :new)
+    # post("/users/log_in", UserSessionController, :create)
 
-    get("/users/reset_password", UserResetPasswordController, :new)
+    live_session(:redirect_if_user_is_authenticated, on_mount: [{PreubaAuthWeb.UserAuth, :mount_current_user}]) do
+
+    live "/users/register", UserRegistrationLive, :new
+    live "/users/log_in", UserLoginLive, :new
+    live "users/reset_password", UserResetPasswordLive, :new
+    live "user/reset_password/:token", UserResetPasswordLive, :edit
+  end
+
+    #get("/users/reset_password", UserResetPasswordController, :new)
     post("/users/reset_password", UserResetPasswordController, :create)
     get("/users/reset_password/:token", UserResetPasswordController, :edit)
     put("/users/reset_password/:token", UserResetPasswordController, :update)
@@ -51,7 +62,7 @@ defmodule PreubaAuthWeb.Router do
 
   scope "/", PreubaAuthWeb do
     pipe_through(:browser)
- 
+
     get("/users/confirm", UserConfirmationController, :new)
     post("/users/confirm", UserConfirmationController, :create)
     get("/users/confirm/:token", UserConfirmationController, :edit)
