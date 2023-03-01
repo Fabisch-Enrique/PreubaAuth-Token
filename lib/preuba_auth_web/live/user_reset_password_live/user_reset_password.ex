@@ -28,7 +28,7 @@ defmodule PruebaAuthWeb.UserResetPasswordLive.UserResetPassword do
     ~H"""
     <h1>Reset password</h1>
 
-    <.form let={f} for={@changeset} phx-submit={"reset_password" @token}>
+    <.form let={f} for={@changeset} phx-submit={"reset_password"}>
 
       <%= if @changeset.action do %>
 
